@@ -6,6 +6,7 @@ import { AuthContext } from '../../context/AuthContext'
 import { ChatContext } from '../../context/ChatContext'
 import { useState } from 'react'
 import { useEffect } from 'react'
+import { useRef } from 'react'
 
 const Sidebar = ({}) => {
 
@@ -19,6 +20,24 @@ const Sidebar = ({}) => {
 
     const navigate = useNavigate()
 
+    const [menuOpen, setMenuOpen] = useState(false);
+    const menuRef = useRef(null);
+
+    // close the menu when tapping/clicking anywhere outside it
+    useEffect(()=>{
+        const handleOutside = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target)) {
+                setMenuOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleOutside);
+        document.addEventListener('touchstart', handleOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleOutside);
+            document.removeEventListener('touchstart', handleOutside);
+        };
+    },[]);
+
     useEffect(()=>{
         getUsers();
     },[onlineUsers])
@@ -28,12 +47,14 @@ const Sidebar = ({}) => {
       <div className='pb-5'>
         <div className='flex justify-between items-center'>
             <img src={assets.logo} alt="logo" className='max-w-40'/>
-            <div className='relative py-2 group'>
-                <img src={assets.menu_icon} alt="logo" className='max-h-5 cursor-pointer' />
-                <div className='absolute right-0 top-full z-20 w-32 p-5 rounded-md bg-[#282142] border border-gray-600 text-gray-100 hidden group-hover:block'>
-                    <p onClick = {()=>navigate('/profile')} className='cursor-pointer text-sm'>Edit Profile</p>
+            <div ref={menuRef} className='relative'>
+                <div onClick={()=>setMenuOpen(prev=>!prev)} className='p-2 cursor-pointer'>
+                    <img src={assets.menu_icon} alt="menu" className='max-h-5' />
+                </div>
+                <div className={`absolute right-0 top-full z-20 w-32 p-5 rounded-md bg-[#282142] border border-gray-600 text-gray-100 ${menuOpen ? 'block' : 'hidden'}`}>
+                    <p onClick = {()=>{setMenuOpen(false); navigate('/profile')}} className='cursor-pointer text-sm'>Edit Profile</p>
                     <hr className="my-2 border-t border-gray-500"/>
-                    <p onClick = {()=>logout()}  className='cursor-pointer text-sm'>Logout</p>
+                    <p onClick = {()=>{setMenuOpen(false); logout()}}  className='cursor-pointer text-sm'>Logout</p>
                 </div>
             </div>
         </div>
