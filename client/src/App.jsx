@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage'
 import ProfilePage from './pages/ProfilePage'
 import {Toaster} from "react-hot-toast"
 import { AuthContext } from '../context/AuthContext'
+import { Analytics } from '@vercel/analytics/react'
 
 const App = () => {
 
@@ -18,6 +19,7 @@ const App = () => {
         <Route path='/login' element={!authUser ? <LoginPage/> : <Navigate to="/"/>} />
         <Route path='/profile' element={authUser ? <ProfilePage/> : <Navigate to="/login"/>} />
       </Routes>
+      <Analytics />
     </div>
   )
 }
